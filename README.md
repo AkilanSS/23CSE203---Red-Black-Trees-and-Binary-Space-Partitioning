@@ -3,7 +3,7 @@
 - Adwit Singh - CB.SC.U4CSE24704
 - Akilan - CB.SC.U4CSE24707
 - Dishitha - CB.SC.U4CSE24713
-- Mahima - CB.SC.U4CSE24732
+- Mahima R Iyer- CB.SC.U4CSE24732
 
 # File Structure
 ```
