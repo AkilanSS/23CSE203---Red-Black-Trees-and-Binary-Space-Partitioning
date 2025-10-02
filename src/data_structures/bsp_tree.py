@@ -1,3 +1,5 @@
+from src.geometry.utils import classify_line,classify_point,split_line
+
 class Node:
     def __init__(self,line):
         self.div=line
