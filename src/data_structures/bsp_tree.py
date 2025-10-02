@@ -11,11 +11,11 @@ class BSP:
 
     def build(self,lines):
         
-        if node is None:
-            return
+        if not lines:
+            return None
         
         div=lines[0]
-        node=Node[div]
+        node=Node(div)
         front_list,back_list=[],[]
 
         for i in lines[1:]:
@@ -36,7 +36,7 @@ class BSP:
                 node.lines.append(i)
 
         node.front=self.build(front_list)
-        node.back=self.builf(back_list)
+        node.back=self.build(back_list)
 
         return node
 
