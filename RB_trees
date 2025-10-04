@@ -1,226 +1,214 @@
 class RBNode:
     def __init__(self, value):
-        self.red = False
-        self.parent = None
         self.val = value
+        self.parent = None
         self.left = None
         self.right = None
+        self.red = True          
+        self.color = "RED"
 
 
 class RBTree:
     def __init__(self):
         self.nil = RBNode(None)
         self.nil.red = False
-        self.nil.left = None
-        self.nil.right = None
         self.root = self.nil
 
-    #insert values into the red-black tree
+    # ----- Insertion -----
     def insert(self, value):
         new_node = RBNode(value)
-        new_node.parent = None
         new_node.left = self.nil
         new_node.right = self.nil
-        new_node.red = True
 
         parent = None
         current = self.root
         while current != self.nil:
             parent = current
-            if new_node.val < current.val:
+            if value < current.val:
                 current = current.left
-            elif new_node.val > current.val:
+            elif value > current.val:
                 current = current.right
             else:
-                # duplicate, just ignore
+                # Duplicate, ignore
                 return
 
         new_node.parent = parent
         if parent is None:
             self.root = new_node
-        elif new_node.val < parent.val:
+        elif value < parent.val:
             parent.left = new_node
         else:
             parent.right = new_node
+
         self.fix_insert(new_node)
 
-    def fix_insert(self, new_node):
-        while new_node != self.root and new_node.parent.red:
-            parent = new_node.parent
+    # ----- Fix Insert -----
+    def fix_insert(self, node):
+        while node != self.root and node.parent.red:
+            parent = node.parent
             grandparent = parent.parent
-            if parent == grandparent.right:
-                uncle = grandparent.left
-                if uncle.red:
-                    uncle.red = False
-                    parent.red = False
-                    grandparent.red = True
-                    new_node = grandparent
-                else:
-                    if new_node == parent.left:
-                        new_node = parent
-                        self.rotate_right(new_node)
-                        parent = new_node.parent
-                    
-                    parent.red = False
-                    grandparent.red = True
-                    self.rotate_left(grandparent)
-            else:
+            if grandparent is None:
+                break  # Reached root's child
+
+            if parent == grandparent.left:
                 uncle = grandparent.right
                 if uncle.red:
-                    uncle.red = False
                     parent.red = False
+                    uncle.red = False
                     grandparent.red = True
-                    new_node = grandparent
+                    node = grandparent
                 else:
-                    if new_node == parent.right:
-                        new_node = parent
-                        self.rotate_left(new_node)
-                        parent = new_node.parent
-                    
+                    if node == parent.right:
+                        node = parent
+                        self.rotate_left(node)
+                        parent = node.parent
                     parent.red = False
                     grandparent.red = True
                     self.rotate_right(grandparent)
+            else:
+                uncle = grandparent.left
+                if uncle.red:
+                    parent.red = False
+                    uncle.red = False
+                    grandparent.red = True
+                    node = grandparent
+                else:
+                    if node == parent.left:
+                        node = parent
+                        self.rotate_right(node)
+                        parent = node.parent
+                    parent.red = False
+                    grandparent.red = True
+                    self.rotate_left(grandparent)
         self.root.red = False
 
-    #Left Rotation
-    def rotate_left(self, pivot_parent):
-        if pivot_parent == self.nil or pivot_parent.right == self.nil:
-            return
-        
-        pivot = pivot_parent.right
-        pivot_parent.right = pivot.left
-        if pivot.left != self.nil:
-            pivot.left.parent = pivot_parent
-        
-        pivot.parent = pivot_parent.parent
-        if pivot_parent.parent is None:
-            self.root = pivot
-        elif pivot_parent == pivot_parent.parent.left:
-            pivot_parent.parent.left = pivot
+    # ----- Left Rotation -----
+    def rotate_left(self, x):
+        y = x.right
+        x.right = y.left
+        if y.left != self.nil:
+            y.left.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y
+        elif x == x.parent.left:
+            x.parent.left = y
         else:
-            pivot_parent.parent.right = pivot
-        
-        pivot.left = pivot_parent
-        pivot_parent.parent = pivot
+            x.parent.right = y
+        y.left = x
+        x.parent = y
 
-    #Right Rotation
-    def rotate_right(self, pivot_parent):
-        if pivot_parent == self.nil or pivot_parent.left == self.nil:
-            return
-
-        pivot = pivot_parent.left
-        pivot_parent.left = pivot.right
-        if pivot.right != self.nil:
-            pivot.right.parent = pivot_parent
-        
-        pivot.parent = pivot_parent.parent
-        if pivot_parent.parent is None:
-            self.root = pivot
-        elif pivot_parent == pivot_parent.parent.right:
-            pivot_parent.parent.right = pivot
+    # ----- Right Rotation -----
+    def rotate_right(self, x):
+        y = x.left
+        x.left = y.right
+        if y.right != self.nil:
+            y.right.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y
+        elif x == x.parent.right:
+            x.parent.right = y
         else:
-            pivot_parent.parent.left = pivot
-        
-        pivot.right = pivot_parent
-        pivot_parent.parent = pivot
+            x.parent.left = y
+        y.right = x
+        x.parent = y
 
-    #Check if a value exists in the tree
-    def exists(self, value):
-        curr = self.root
-        while curr != self.nil and value != curr.val:
-            if value < curr.val:
-                curr = curr.left
+    # ----- Search -----
+    def search(self, value):
+        current = self.root
+        while current != self.nil:
+            if value < current.val:
+                current = current.left
+            elif value > current.val:
+                current = current.right
             else:
-                curr = curr.right
-        return curr!= self.nil
+                return True
+        return False
 
-    #Traversal:inorder
-    def inorder(self,node=None):
+    # ----- Inorder Traversal -----
+    def inorder(self, node=None):
         if node is None:
-            node=self.root
-        
-        if node!=self.nil:
+            node = self.root
+        if node != self.nil:
             self.inorder(node.left)
-            color="R" if node.red else "B"
-            print(f"{node.val}({color})",end=" ")
+            color = "R" if node.red else "B"
+            print(f"{node.val}({color})", end=" ")
             self.inorder(node.right)
-    
-# Deletion of Red-Black Tree 
-    #Replaces one subtree with another subtree
-    def transplant(self,u,v):
+
+# ----- Deletion -----
+    # Transplant one subtree for another
+    def transplant(self, u, v):
         if u.parent is None:
-            self.root=v
-        elif u==u.parent.left:
-            u.parent.left=v
+            self.root = v
+        elif u == u.parent.left:
+            u.parent.left = v
         else:
-            u.parent.right=v
-        v.parent=u.parent
+            u.parent.right = v
+        v.parent = u.parent
 
-    #Used when deleting a node with two children
-    def minimum(self,node):
-        while node.left!=self.nil:
-            node=node.left
+    # Find the minimum node in a subtree
+    def minimum(self, node):
+        while node.left != self.nil:
+            node = node.left
         return node
-    
-    def delete(self,value):
-        node=self.root
-        while node!=self.nil and node.val!=value:
-            if value<node.val:
-                node=node.left
+
+    # Delete a node with a given value
+    def delete(self, value):
+        z = self.root
+        while z != self.nil and z.val != value:
+            if value < z.val:
+                z = z.left
             else:
-                node=node.right
-        if node==self.nil:
-            print(f"{value} not found")
-            return
+                z = z.right
+        if z == self.nil:
+            return  # Node not found
 
-        y=node #noderemoved from the tree
-        y_original_red=y.red
-
-        if node.left==self.nil:
-            x=node.right
-            self.transplant(node,node.right)
-
-        elif node.right==self.nil:
-            x=node.left
-            self.transplant(node,node.left)
+        y = z
+        y_original_red = y.red
+        if z.left == self.nil:
+            x = z.right
+            self.transplant(z, z.right)
+        elif z.right == self.nil:
+            x = z.left
+            self.transplant(z, z.left)
         else:
-            y=self.minimum(node.right)
-            y_original_red=y.red
-            x=y.right if y.right!=self.nil else self.nil 
-
-            if y.parent==node and x!=self.nil:
-                x.parent=y
+            y = self.minimum(z.right)
+            y_original_red = y.red
+            x = y.right
+            if y.parent == z:
+                x.parent = y
             else:
-                self.transplant(y,y.right)
-                y.right=node.right
-                y.right.parent=y
-            self.transplant(node,y)
-            y.left=node.left
-            y.left.parent=y
-            y.red=node.red
-        
+                self.transplant(y, y.right)
+                y.right = z.right
+                y.right.parent = y
+            self.transplant(z, y)
+            y.left = z.left
+            y.left.parent = y
+            y.red = z.red
+
         if not y_original_red:
             self.fix_delete(x)
 
+    # ----- Fix Delete -----
     def fix_delete(self, x):
         while x != self.root and not x.red:
             if x == x.parent.left:
                 w = x.parent.right
-                if w.red:  # Case 1
+                if w.red:
                     w.red = False
                     x.parent.red = True
                     self.rotate_left(x.parent)
                     w = x.parent.right
-                if not w.left.red and not w.right.red:  # Case 2
+                if not w.left.red and not w.right.red:
                     w.red = True
                     x = x.parent
                 else:
-                    if not w.right.red:  # Case 3
+                    if not w.right.red:
                         w.left.red = False
                         w.red = True
                         self.rotate_right(w)
                         w = x.parent.right
-                    # Case 4
                     w.red = x.parent.red
                     x.parent.red = False
                     w.right.red = False
@@ -228,26 +216,35 @@ class RBTree:
                     x = self.root
             else:
                 w = x.parent.left
-                if w.red:  # Case 1 (mirror)
+                if w.red:
                     w.red = False
                     x.parent.red = True
                     self.rotate_right(x.parent)
                     w = x.parent.left
-                if not w.left.red and not w.right.red:  # Case 2 (mirror)
+                if not w.left.red and not w.right.red:
                     w.red = True
                     x = x.parent
                 else:
-                    if not w.left.red:  # Case 3 (mirror)
+                    if not w.left.red:
                         w.right.red = False
                         w.red = True
                         self.rotate_left(w)
                         w = x.parent.left
-                    # Case 4 (mirror)
                     w.red = x.parent.red
                     x.parent.red = False
                     w.left.red = False
                     self.rotate_right(x.parent)
                     x = self.root
         x.red = False
-
-
+    
+    # ----- Search -----
+    def search(self, value):
+        current = self.root
+        while current != self.nil:
+            if value < current.val:
+                current = current.left
+            elif value > current.val:
+                current = current.right
+            else:
+                return True  # Found the value
+        return False  # Not found
