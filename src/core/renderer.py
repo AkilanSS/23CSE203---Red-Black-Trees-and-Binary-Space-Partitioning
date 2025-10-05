@@ -1,8 +1,12 @@
+from src.geometry.line import Line
+
 class Renderer:
     """Manages and renders all renderable objects, handling camera and layers."""
     def __init__(self):
-        self.objects = []
+        self.lineObjects : list[Line] = []
+        self.objects : list[Line] = []
         self.camera_offset = [0, 0]
+        self.cameraPos = tuple()
 
     def add(self, obj):
         """Add a renderable object to the list."""

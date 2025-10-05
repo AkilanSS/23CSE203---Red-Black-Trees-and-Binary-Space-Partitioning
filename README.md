@@ -22,9 +22,8 @@ bsp_visualizer/
     │   └── rb_tree.py          # Red-Black Tree Node and Tree implementation.
     │
     ├── geometry/
-    │   ├── init.py
-    │   ├── line.py             # Defines a LineSegment class with geometry helpers.
-    │   └── utils.py            # Geometric functions (intersection, splitting, etc.).
+    │   ├── init.py            # Defines a LineSegment class with geometry helpers.
+    │   └── line.py           # Geometric functions (intersection, splitting, etc.).
     │
     └── core/
         ├── init.py
