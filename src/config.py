@@ -1,5 +1,5 @@
 # Screen Settings
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1000, 800
 FPS = 60
 
 # Colors

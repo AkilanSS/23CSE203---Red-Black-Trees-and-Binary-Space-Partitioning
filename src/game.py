@@ -10,6 +10,7 @@ from  .data_structures.bsp_tree import BSP, Node
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Modular Draw Lines Example")
         self.clock = pygame.time.Clock()
@@ -19,6 +20,15 @@ class Game:
         
         self.drawing = False
         self.start_pos = None
+
+        self.camera = None
+        self.rootBSP = None
+        self.renderTree = None
+
+        self.fontBold = pygame.font.Font("src/assets/PixelifySans-Bold.ttf", 30)
+        self.fontMedium = pygame.font.Font("src/assets/PixelifySans-Medium.ttf", 20)
+        self.fontRegular = pygame.font.Font("src/assets/Jersey15-Regular.ttf", 30)
+        self.fontSemiBold = pygame.font.Font("src/assets/PixelifySans-SemiBold.ttf", 30)
 
     def run(self):
         while self.is_running:
@@ -51,16 +61,23 @@ class Game:
                     self.start_pos = None
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
-                    self.drawing = False
                     mx, my = pygame.mouse.get_pos()
-                    camera = Camera((mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1]), GREEN, 5)
-                    self.renderer.add(camera)
-
-            elif event.type == pygame.KEYDOWN:
+                    self.renderer.cameraPos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
+                    self.camera = Camera(self.renderer.cameraPos, GREEN, 5)
+                    self.renderer.add(self.camera)
                 if event.key == pygame.K_b:
-                    renderTree = BSP(self.renderer.lineObjects)
-                    rootBSP : Node  = renderTree.build(self.renderer.lineObjects)
-                    renderTree.traverse(rootBSP, self.renderer.cameraPos, result= None)
+                    linesToBuild = self.renderer.lineObjects.copy()
+                    self.renderTree = BSP(linesToBuild, self.renderer)
+                    self.rootBSP : Node  = self.renderTree.build(linesToBuild)
+                
+                if event.key == pygame.K_t:
+                    traversal_order = []
+                    self.renderTree.traverse(self.rootBSP, self.renderer.cameraPos, traversal_order, self.screen)
+                    print(self.rootBSP)
+                
+                if event.key == pygame.K_r:
+                    print("resetting camera")
+                    self.renderer.remove(self.camera)
 
 
     def _update(self):
@@ -78,6 +95,20 @@ class Game:
         self.screen.fill(WHITE)
         
         self.renderer.draw(self.screen)
+
+        titleText = self.fontBold.render("Optimal Object Lookup using RB trees and BSP trees", False, BLACK)
+        instructionText1 = self.fontRegular.render("Drag your mouse to draw lines on the screen", False, BLACK)
+        instructionText2 = self.fontRegular.render("Press C to place a camera under the cursor", False, BLACK)
+        instructionText3 = self.fontRegular.render("Press B to build the BSP tree", False, BLACK)
+        instructionText4 = self.fontRegular.render("Press T to traverse the tree", False, BLACK)
+        instructionText5 = self.fontRegular.render("Press R to clear the camera position", False, BLACK)
+
+        self.screen.blit(titleText, (10,10))
+        self.screen.blit(instructionText1, (10, 680))
+        self.screen.blit(instructionText2, (10, 700))
+        self.screen.blit(instructionText3, (10, 720))
+        self.screen.blit(instructionText4, (10, 740))
+        self.screen.blit(instructionText5, (10, 760))
         
         if self.drawing and self.start_pos:
             mx, my = pygame.mouse.get_pos()

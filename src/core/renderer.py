@@ -13,6 +13,9 @@ class Renderer:
         if obj not in self.objects:
             self.objects.append(obj)
 
+            if type(obj) == Line:
+                self.lineObjects.append(obj)
+
     def remove(self, obj):
         """Remove a renderable object from the list."""
         if obj in self.objects:
