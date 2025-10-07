@@ -1,0 +1,4 @@
+.venv
+__pycache__
+*.pyc
+src/geometry/__pycache__/camera.cpython-313.pyc

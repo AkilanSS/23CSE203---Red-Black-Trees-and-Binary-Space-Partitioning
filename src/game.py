@@ -4,11 +4,14 @@ import sys
 from .config import *
 from .core.renderer import Renderer
 from .geometry.line import Line
+from .geometry.circle import Circle
+from  .data_structures.bsp_tree import BSP, Node
+from .geometry.distr_points import DistibutePoints
 
 class Game:
-    """Manages the main game loop, state, and events."""
     def __init__(self):
         pygame.init()
+        pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Modular Draw Lines Example")
         self.clock = pygame.time.Clock()
@@ -16,12 +19,19 @@ class Game:
         
         self.renderer = Renderer()
         
-        # Game state
         self.drawing = False
         self.start_pos = None
 
+        self.camera = None
+        self.rootBSP = None
+        self.renderTree = None
+
+        self.fontBold = pygame.font.Font("src/assets/PixelifySans-Bold.ttf", 30)
+        self.fontMedium = pygame.font.Font("src/assets/PixelifySans-Medium.ttf", 20)
+        self.fontRegular = pygame.font.Font("src/assets/Jersey15-Regular.ttf", 30)
+        self.fontSemiBold = pygame.font.Font("src/assets/PixelifySans-SemiBold.ttf", 30)
+
     def run(self):
-        """The main game loop."""
         while self.is_running:
             self._handle_events()
             self._update()
@@ -32,30 +42,51 @@ class Game:
         sys.exit()
 
     def _handle_events(self):
-        """Handles user input and other events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.is_running = False
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left mouse button
+                if event.button == 1: 
                     self.drawing = True
                     mx, my = pygame.mouse.get_pos()
-                    # Convert screen coordinates to world coordinates
                     self.start_pos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
             
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1 and self.drawing:
                     self.drawing = False
                     mx, my = pygame.mouse.get_pos()
-                    # Convert screen coordinates to world coordinates
                     end_pos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
                     new_line = Line(self.start_pos, end_pos, BLACK, width=2)
                     self.renderer.add(new_line)
                     self.start_pos = None
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    mx, my = pygame.mouse.get_pos()
+                    self.renderer.cameraPos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
+                    self.camera = Circle(self.renderer.cameraPos, GREEN, 5)
+                    self.renderer.add(self.camera)
+                if event.key == pygame.K_b:
+                    linesToBuild = self.renderer.lineObjects.copy()
+                    self.renderTree = BSP(linesToBuild, self.renderer)
+                    self.rootBSP : Node  = self.renderTree.build(linesToBuild)
+                
+                if event.key == pygame.K_t:
+                    traversal_order = []
+                    self.renderTree.traverse(self.rootBSP, self.renderer.cameraPos, traversal_order, self.screen)
+                    print(self.rootBSP)
+                
+                if event.key == pygame.K_r:
+                    print("resetting camera")
+                    self.renderer.remove(self.camera)
+                
+                if event.key == pygame.K_d:
+                    distribution = DistibutePoints(self.renderer, 100)
+                    distribution.generate()
+                    distribution.render()
+
 
     def _update(self):
-        """Updates game state, like camera movement."""
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.renderer.camera_offset[0] -= CAMERA_SPEED
@@ -67,17 +98,26 @@ class Game:
             self.renderer.camera_offset[1] += CAMERA_SPEED
 
     def _draw(self):
-        """Renders everything to the screen."""
         self.screen.fill(WHITE)
         
-        # Draw all permanent lines
         self.renderer.draw(self.screen)
+
+        titleText = self.fontBold.render("Optimal Object Lookup using RB trees and BSP trees", False, BLACK)
+        instructionText1 = self.fontRegular.render("Drag your mouse to draw lines on the screen", False, BLACK)
+        instructionText2 = self.fontRegular.render("Press C to place a camera under the cursor", False, BLACK)
+        instructionText3 = self.fontRegular.render("Press B to build the BSP tree", False, BLACK)
+        instructionText4 = self.fontRegular.render("Press T to traverse the tree", False, BLACK)
+        instructionText5 = self.fontRegular.render("Press R to clear the camera position", False, BLACK)
+
+        self.screen.blit(titleText, (10,10))
+        self.screen.blit(instructionText1, (10, 680))
+        self.screen.blit(instructionText2, (10, 700))
+        self.screen.blit(instructionText3, (10, 720))
+        self.screen.blit(instructionText4, (10, 740))
+        self.screen.blit(instructionText5, (10, 760))
         
-        # Draw the temporary preview line while drawing
         if self.drawing and self.start_pos:
             mx, my = pygame.mouse.get_pos()
-            # Start position is in world coords, mouse pos is in screen coords.
-            # Convert start_pos to screen coords for drawing.
             start_screen_pos = (self.start_pos[0] - self.renderer.camera_offset[0], 
                                 self.start_pos[1] - self.renderer.camera_offset[1])
             pygame.draw.line(self.screen, RED, start_screen_pos, (mx, my), 2)
