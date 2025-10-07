@@ -1,5 +1,5 @@
 import unittest
-from RB_trees import RBTree
+from src.data_structures.rb_tree import RBTree
 
 class TestCustomRBTree(unittest.TestCase):
     def setUp(self):
