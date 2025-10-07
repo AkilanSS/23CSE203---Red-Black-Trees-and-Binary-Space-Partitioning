@@ -6,6 +6,7 @@ from .core.renderer import Renderer
 from .geometry.line import Line
 from .geometry.circle import Circle
 from  .data_structures.bsp_tree import BSP, Node
+from .data_structures.rb_tree import RBTree
 from .geometry.distr_points import DistibutePoints
 
 class Game:
@@ -30,6 +31,8 @@ class Game:
         self.fontMedium = pygame.font.Font("src/assets/PixelifySans-Medium.ttf", 20)
         self.fontRegular = pygame.font.Font("src/assets/Jersey15-Regular.ttf", 30)
         self.fontSemiBold = pygame.font.Font("src/assets/PixelifySans-SemiBold.ttf", 30)
+
+        self.distribution = []
 
     def run(self):
         while self.is_running:
@@ -64,7 +67,7 @@ class Game:
                 if event.key == pygame.K_c:
                     mx, my = pygame.mouse.get_pos()
                     self.renderer.cameraPos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
-                    self.camera = Circle(self.renderer.cameraPos, GREEN, 5)
+                    self.camera = Circle(self.renderer.cameraPos, GREEN, 7)
                     self.renderer.add(self.camera)
                 if event.key == pygame.K_b:
                     linesToBuild = self.renderer.lineObjects.copy()
@@ -81,9 +84,31 @@ class Game:
                     self.renderer.remove(self.camera)
                 
                 if event.key == pygame.K_d:
-                    distribution = DistibutePoints(self.renderer, 100)
-                    distribution.generate()
-                    distribution.render()
+                    self.distribution = DistibutePoints(self.renderer, 500)
+                    self.distribution.generate()
+                    self.distribution.render()
+                
+                if event.key == pygame.K_l:
+                    distanceTree = RBTree()
+                    for point in self.distribution.circles:
+                        distance = ((point.pos[0] - self.camera.pos[0])**2 + (point.pos[1] - self.camera.pos[1])**2)**0.5
+                        distanceTree.insert(distance, point)
+                    
+                    (high, low) = map(float, input("Enter the range you want to render in high quality: ").split())
+                    range1 : list[tuple[float, Circle]] = distanceTree.range_query(high, low)
+                    for (distance, point) in range1:
+                        point.color = PINK
+                
+                    (high, low) = map(float, input("Enter the range you want to render in medium quality: ").split())
+                    range1 : list[tuple[float, Circle]] = distanceTree.range_query(high, low)
+                    for (distance, point) in range1:
+                        point.color = LIME
+                        
+                    (high, low) = map(float, input("Enter the range you want to render in low quality: ").split())
+                    range1 : list[tuple[float, Circle]] = distanceTree.range_query(high, low)
+                    for (distance, point) in range1:
+                        point.color = VIOLET
+                       
 
 
     def _update(self):

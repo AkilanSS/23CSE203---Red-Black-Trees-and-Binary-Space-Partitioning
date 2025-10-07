@@ -1,22 +1,26 @@
 class RBNode:
-    def __init__(self, value):
+    def __init__(self, value, point):
         self.val = value
         self.parent = None
         self.left = None
         self.right = None
         self.red = True          
         self.color = "RED"
+        self.point = point
 
 
 class RBTree:
     def __init__(self):
-        self.nil = RBNode(None)
+        self.nil = RBNode(None, None)
         self.nil.red = False
         self.root = self.nil
 
+    def getRoot(self):
+        return self.root
+
     # ----- Insertion -----
-    def insert(self, value):
-        new_node = RBNode(value)
+    def insert(self, value, point):
+        new_node = RBNode(value, point)
         new_node.left = self.nil
         new_node.right = self.nil
 
@@ -248,3 +252,23 @@ class RBTree:
             else:
                 return True  # Found the value
         return False  # Not found
+    
+    def range_query(self, low, high):
+        result = []
+        def inorder_range(node):
+            if node is self.nil:
+                return
+
+            if node.val > low:
+                inorder_range(node.left)
+            
+            if low <= node.val <= high:
+                result.append((node.val, node.point))
+                print(node.val)
+
+            if node.val < high:
+                inorder_range(node.right)
+        
+        inorder_range(self.root)
+        return result
+        

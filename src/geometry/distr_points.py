@@ -8,7 +8,7 @@ from src.core.renderer import Renderer
 class DistibutePoints:
     def __init__(self, screen, number):
         self.circles = []
-        self.radius = 1
+        self.radius = 3
         self.screen  : Renderer = screen
         self.number = number
         
