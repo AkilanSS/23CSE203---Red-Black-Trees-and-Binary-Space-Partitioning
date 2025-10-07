@@ -109,3 +109,6 @@ A Red-Black Tree is a self-balancing binary search tree that maintains its balan
 * Add a visual representation of both the BSP and Red-Black trees on a side panel.
 * Create a "painter's algorithm" mode that uses the BSP tree's traversal order to render lines from back-to-front.
 * Allow users to save and load line configurations from a file.
+
+## License
+<a href="https://github.com/AkilanSS/23CSE203---Red-Black-Trees-and-Binary-Space-Partitioning/tree/main">23CSE203---Red-Black-Trees-and-Binary-Space-Partitioning</a> © 2025 by <a href="https://github.com/AkilanSS">Akilan S S, Adwit Singh R, Dishitha, Mahima R Iyer</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 0.2em;max-height:0.2em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 0.2em;max-height:0.2em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 0.2em;max-height:0.2em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nd.svg" alt="" style="max-width: 0.2em;max-height:0.2em;margin-left: .2em;">
