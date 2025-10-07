@@ -4,8 +4,9 @@ import sys
 from .config import *
 from .core.renderer import Renderer
 from .geometry.line import Line
-from .geometry.camera import Camera
+from .geometry.circle import Circle
 from  .data_structures.bsp_tree import BSP, Node
+from .geometry.distr_points import DistibutePoints
 
 class Game:
     def __init__(self):
@@ -63,7 +64,7 @@ class Game:
                 if event.key == pygame.K_c:
                     mx, my = pygame.mouse.get_pos()
                     self.renderer.cameraPos = (mx + self.renderer.camera_offset[0], my + self.renderer.camera_offset[1])
-                    self.camera = Camera(self.renderer.cameraPos, GREEN, 5)
+                    self.camera = Circle(self.renderer.cameraPos, GREEN, 5)
                     self.renderer.add(self.camera)
                 if event.key == pygame.K_b:
                     linesToBuild = self.renderer.lineObjects.copy()
@@ -78,6 +79,11 @@ class Game:
                 if event.key == pygame.K_r:
                     print("resetting camera")
                     self.renderer.remove(self.camera)
+                
+                if event.key == pygame.K_d:
+                    distribution = DistibutePoints(self.renderer, 100)
+                    distribution.generate()
+                    distribution.render()
 
 
     def _update(self):
